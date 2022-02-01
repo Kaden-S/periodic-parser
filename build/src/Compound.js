@@ -64,6 +64,10 @@ const METAL_TYPES = [
 ];
 class Compound {
     constructor(compoundName) {
+        try {
+            return (0, Elements_1.getCompound)(compoundName);
+        }
+        catch (err) { }
         const parts = (compoundName.match(/(\(.*?\)\d*)|([A-z]{3,} ?\([IiVvXx]+\))|([A-Z][a-z]*\d*)|([A-z]{3,})/g) || [])
             .filter((el) => el)
             //
@@ -75,8 +79,9 @@ class Compound {
             //
             .map((el) => {
             //
-            // ["Al2", "(SO4)3"] -> [["Al", 2], ["SO4", 3]]
-            // ["H2", "S", "O4"] -> [["H", 2], ["S", 1], ["O", 4]]
+            // ["Al2", "(SO4)3"]        -> [["Al", 2], ["SO4", 3]]
+            // ["H2", "S", "O4"]        -> [["H", 2], ["S", 1], ["O", 4]]
+            // ["Iron(II)", "Chloride"] -> [["Iron(II)", 1], ["Chloride", 1]]
             //
             const [_, symbol, n] = (el.match(/^([A-z]*)(\d*)$|^\((.*)\)(\d+)$|^([A-z]{3,} ?\([IiVvXx]+\))$/) || []).filter((el) => el);
             if (!symbol)
@@ -95,7 +100,9 @@ class Compound {
             isAmmonium(s, s1, n, n1) ||
             S === "AMMONIUM" ||
             isCharged(s) ||
-            METAL_TYPES.includes((0, Elements_1.getElement)(parts[0][0].replace(/ ?\([IiVvXx]+\)/, "")).type)) {
+            METAL_TYPES.includes((0, Elements_1.getElement)(parts[0][0].replace(/ ?\([IiVvXx]+\)/, "")).type)
+        // TODO: Check for hydrogen bonds here
+        ) {
             return new IonicCompound(parts);
         }
         return new MolecularCompound(parts);
@@ -161,8 +168,8 @@ function ensureIonic(parts) {
     if (!ion1)
         throw new Error("Invalid Ion: " + symbol1);
     return [
-        [ion, 1],
-        [ion1, 1],
+        [ion, n],
+        [ion1, n1],
     ];
 }
 function balanceIonicCompound(parts) {

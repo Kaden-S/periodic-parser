@@ -3,15 +3,19 @@ import type {
   Ion,
   Elements,
   Ions,
+  Compounds,
   AnionMap,
   AtomicNumberMap,
   ReversedAnionMap,
   SymbolMap,
-} from "./Element";
+  Compound,
+} from "./types";
 
 export type ElementString = keyof Elements | keyof typeof ELEMENT_MAP;
 
 export type IonString = keyof Ions | keyof typeof ION_MAP;
+
+export type CompoundString = keyof Compounds | keyof typeof COMPOUND_MAP;
 
 export function isIon(el: Element | Ion): boolean {
   return !("group" in el);
@@ -41,6 +45,24 @@ export function getElement(key: ElementString | IonString): Element | Ion {
   if (typeof key === "string" && key.match(/\d/)) return ion();
 
   return ELEMENTS[key as "HYDROGEN"] || ELEMENTS[ELEMENT_MAP[key]] || ion();
+}
+
+export function getCompound(compound: CompoundString): Compound {
+  if (typeof compound === "number") {
+    const c = COMPOUNDS[COMPOUND_MAP[compound]];
+
+    if (typeof c === "undefined") throw new Error("Compound exceeds index");
+    return c;
+  }
+
+  const key = compound.toUpperCase();
+  if (key in COMPOUNDS) return COMPOUNDS[key as "WATER"];
+
+  if (compound in COMPOUND_MAP) return COMPOUNDS[COMPOUND_MAP[compound]];
+
+  if (key in COMPOUND_MAP) return COMPOUNDS[COMPOUND_MAP[compound]];
+
+  throw new Error("Invalid compound");
 }
 
 export const ELEMENTS: Elements = {
@@ -2673,6 +2695,24 @@ const ION_MAP: { [key: string]: keyof Ions } = {
   SO4: "SULFATE",
   28: "SULFITE",
   SO3: "SULFITE",
+};
+
+export const COMPOUNDS: Compounds = {
+  WATER: {
+    atomicMass: ELEMENTS.HYDROGEN.atomicMass * 2 + ELEMENTS.OXYGEN.atomicMass,
+    name: "Water",
+    parts: [
+      [ELEMENTS.HYDROGEN, 2],
+      [ELEMENTS.OXYGEN, 1],
+    ],
+    symbol: "H2O",
+    type: "molecular",
+  },
+};
+
+export const COMPOUND_MAP: { [key: string]: keyof Compounds } = {
+  0: "WATER",
+  H2O: "WATER",
 };
 
 // TODO: Add named compound list

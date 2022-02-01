@@ -1,3 +1,5 @@
+import { Compound } from ".";
+
 export interface BaseElement {
   atomicMass: number;
   name: string;
@@ -428,3 +430,9 @@ export type AtomicNumberMap = {
   97: "BERKELIUM";
   98: "CALIFORNIUM";
 };
+
+export type { Compound } from "./Compound";
+
+export interface Compounds {
+  WATER: Compound;
+}

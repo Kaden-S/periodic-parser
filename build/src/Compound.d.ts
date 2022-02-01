@@ -1,4 +1,4 @@
-import type { Element, Ion } from "./Element";
+import type { Element, Ion } from "./types";
 export interface Compound {
     name: string;
     type: "molecular" | "ionic";

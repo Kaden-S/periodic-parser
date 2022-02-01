@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.IONS = exports.ATOMIC_NUMBER_MAP = exports.SYMBOL_MAP = exports.REVERSED_ANION_MAP = exports.ANION_MAP = exports.ELEMENTS = exports.getElement = exports.getIon = exports.isIon = void 0;
+exports.COMPOUND_MAP = exports.COMPOUNDS = exports.IONS = exports.ATOMIC_NUMBER_MAP = exports.SYMBOL_MAP = exports.REVERSED_ANION_MAP = exports.ANION_MAP = exports.ELEMENTS = exports.getCompound = exports.getElement = exports.getIon = exports.isIon = void 0;
 function isIon(el) {
     return !("group" in el);
 }
@@ -33,6 +33,23 @@ function getElement(key) {
     return exports.ELEMENTS[key] || exports.ELEMENTS[ELEMENT_MAP[key]] || ion();
 }
 exports.getElement = getElement;
+function getCompound(compound) {
+    if (typeof compound === "number") {
+        const c = exports.COMPOUNDS[exports.COMPOUND_MAP[compound]];
+        if (typeof c === "undefined")
+            throw new Error("Compound exceeds index");
+        return c;
+    }
+    const key = compound.toUpperCase();
+    if (key in exports.COMPOUNDS)
+        return exports.COMPOUNDS[key];
+    if (compound in exports.COMPOUND_MAP)
+        return exports.COMPOUNDS[exports.COMPOUND_MAP[compound]];
+    if (key in exports.COMPOUND_MAP)
+        return exports.COMPOUNDS[exports.COMPOUND_MAP[compound]];
+    throw new Error("Invalid compound");
+}
+exports.getCompound = getCompound;
 exports.ELEMENTS = {
     HYDROGEN: {
         atomicMass: 1.00794,
@@ -2644,5 +2661,21 @@ const ION_MAP = {
     SO4: "SULFATE",
     28: "SULFITE",
     SO3: "SULFITE",
+};
+exports.COMPOUNDS = {
+    WATER: {
+        atomicMass: exports.ELEMENTS.HYDROGEN.atomicMass * 2 + exports.ELEMENTS.OXYGEN.atomicMass,
+        name: "Water",
+        parts: [
+            [exports.ELEMENTS.HYDROGEN, 2],
+            [exports.ELEMENTS.OXYGEN, 1],
+        ],
+        symbol: "H2O",
+        type: "molecular",
+    },
+};
+exports.COMPOUND_MAP = {
+    0: "WATER",
+    H2O: "WATER",
 };
 // TODO: Add named compound list

@@ -1,5 +1,5 @@
-import { getElement, isIon, REVERSED_ANION_MAP } from "./Elements";
-import type { Element, Ion } from "./Element";
+import { getCompound, getElement, isIon, REVERSED_ANION_MAP } from "./Elements";
+import type { Element, Ion } from "./types";
 
 export interface Compound {
   name: string;
@@ -75,6 +75,9 @@ const METAL_TYPES = [
 
 export class Compound {
   constructor(compoundName: string) {
+    try {
+      return getCompound(compoundName);
+    } catch (err) {}
     const parts: [string, number][] = (
       compoundName.match(
         /(\(.*?\)\d*)|([A-z]{3,} ?\([IiVvXx]+\))|([A-Z][a-z]*\d*)|([A-z]{3,})/g
@@ -90,8 +93,9 @@ export class Compound {
       //
       .map((el) => {
         //
-        // ["Al2", "(SO4)3"] -> [["Al", 2], ["SO4", 3]]
-        // ["H2", "S", "O4"] -> [["H", 2], ["S", 1], ["O", 4]]
+        // ["Al2", "(SO4)3"]        -> [["Al", 2], ["SO4", 3]]
+        // ["H2", "S", "O4"]        -> [["H", 2], ["S", 1], ["O", 4]]
+        // ["Iron(II)", "Chloride"] -> [["Iron(II)", 1], ["Chloride", 1]]
         //
         const [_, symbol, n] = (
           el.match(
@@ -121,6 +125,7 @@ export class Compound {
       METAL_TYPES.includes(
         getElement(parts[0][0].replace(/ ?\([IiVvXx]+\)/, "")).type
       )
+      // TODO: Check for hydrogen bonds here
     ) {
       return new IonicCompound(parts);
     }
@@ -209,8 +214,8 @@ function ensureIonic(parts: [string, number][]): [Element | Ion, number][] {
   if (!ion1) throw new Error("Invalid Ion: " + symbol1);
 
   return [
-    [ion, 1],
-    [ion1, 1],
+    [ion, n],
+    [ion1, n1],
   ];
 }
 
