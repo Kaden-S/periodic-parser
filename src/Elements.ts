@@ -55,7 +55,7 @@ export function getCompound(compound: CompoundString): Compound {
     return c;
   }
 
-  const key = compound.toUpperCase();
+  const key = compound.toUpperCase().replace(/\s/g, "_");
   if (key in COMPOUNDS) return COMPOUNDS[key as "WATER"];
 
   if (compound in COMPOUND_MAP) return COMPOUNDS[COMPOUND_MAP[compound]];
@@ -2049,228 +2049,33 @@ export const ANION_MAP: AnionMap = {
   ASTATIDE: "ASTATINE",
 };
 
-export const REVERSED_ANION_MAP: ReversedAnionMap = {
-  HYDROGEN: "HYDRIDE",
-  BORON: "BORIDE",
-  CARBON: "CARBIDE",
-  SILICON: "SILICIDE",
-  GERMANIUM: "GERMANIDE",
-  NITROGEN: "NITRIDE",
-  PHOSPHORUS: "PHOSPHIDE",
-  ARSENIC: "ARSENIDE",
-  ANTIMONY: "ANTIMONIDE",
-  OXYGEN: "OXIDE",
-  SULFUR: "SULFIDE",
-  SELENIUM: "SELENIDE",
-  TELLURIUM: "TELLURIDE",
-  FLUORINE: "FLUORIDE",
-  CHLORINE: "CHLORIDE",
-  BROMINE: "BROMIDE",
-  IODINE: "IODIDE",
-  ASTATINE: "ASTATIDE",
-};
+export const REVERSED_ANION_MAP: ReversedAnionMap = Object.entries(
+  ANION_MAP
+).reduce<ReversedAnionMap>(
+  (p, [element, anion]) => ({
+    [anion]: element,
+    ...p,
+  }),
+  {} as any
+);
 
-export const SYMBOL_MAP: SymbolMap = {
-  H: "HYDROGEN",
-  He: "HELIUM",
-  Li: "LITHIUM",
-  Be: "BERYLLIUM",
-  B: "BORON",
-  C: "CARBON",
-  N: "NITROGEN",
-  O: "OXYGEN",
-  F: "FLUORINE",
-  Ne: "NEON",
-  Na: "SODIUM",
-  Mg: "MAGNESIUM",
-  Al: "ALUMINUM",
-  Si: "SILICON",
-  P: "PHOSPHORUS",
-  S: "SULFUR",
-  Cl: "CHLORINE",
-  Ar: "ARGON",
-  K: "POTASSIUM",
-  Ca: "CALCIUM",
-  Sc: "SCANDIUM",
-  Ti: "TITANIUM",
-  V: "VANADIUM",
-  Cr: "CHROMIUM",
-  Mn: "MANGANESE",
-  Fe: "IRON",
-  Co: "COBALT",
-  Ni: "NICKEL",
-  Cu: "COPPER",
-  Zn: "ZINC",
-  Ga: "GALLIUM",
-  Ge: "GERMANIUM",
-  As: "ARSENIC",
-  Se: "SELENIUM",
-  Br: "BROMINE",
-  Kr: "KRYPTON",
-  Rb: "RUBIDIUM",
-  Sr: "STRONTIUM",
-  Y: "YTTRIUM",
-  Zr: "ZIRCONIUM",
-  Nb: "NIOBIUM",
-  Mo: "MOLYBDENUM",
-  Tc: "TECHNETIUM",
-  Ru: "RUTHENIUM",
-  Rh: "RHODIUM",
-  Pd: "PALLADIUM",
-  Ag: "SILVER",
-  Cd: "CADMIUM",
-  In: "INDIUM",
-  Sn: "TIN",
-  Sb: "ANTIMONY",
-  Te: "TELLURIUM",
-  I: "IODINE",
-  Xe: "XENON",
-  Cs: "CESIUM",
-  Ba: "BARIUM",
-  La: "LANTHANUM",
-  Ce: "CERIUM",
-  Pr: "PRASEODYMIUM",
-  Nd: "NEODYMIUM",
-  Pm: "PROMETHIUM",
-  Sm: "SAMARIUM",
-  Eu: "EUROPIUM",
-  Gd: "GADOLINIUM",
-  Tb: "TERBIUM",
-  Dy: "DYSPROSIUM",
-  Ho: "HOLMIUM",
-  Er: "ERBIUM",
-  Tm: "THULIUM",
-  Yb: "YTTERBIUM",
-  Lu: "LUTETIUM",
-  Hf: "HAFNIUM",
-  Ta: "TANTALUM",
-  W: "TUNGSTEN",
-  Re: "RHENIUM",
-  Os: "OSMIUM",
-  Ir: "IRIDIUM",
-  Pt: "PLATINUM",
-  Au: "GOLD",
-  Hg: "MERCURY",
-  Tl: "THALLIUM",
-  Pb: "LEAD",
-  Bi: "BISMUTH",
-  Po: "POLONIUM",
-  At: "ASTATINE",
-  Rn: "RADON",
-  Fr: "FRANCIUM",
-  Ra: "RADIUM",
-  Ac: "ACTINIUM",
-  Th: "THORIUM",
-  Pa: "PROTACTINIUM",
-  U: "URANIUM",
-  Np: "NEPTUNIUM",
-  Pu: "PLUTONIUM",
-  Am: "AMERICIUM",
-  Cm: "CURIUM",
-  Bk: "BERKELIUM",
-  Cf: "CALIFORNIUM",
-};
+export const SYMBOL_MAP: SymbolMap = Object.entries(ELEMENTS).reduce<SymbolMap>(
+  (p, [name, { symbol }]) => ({
+    [symbol]: name,
+    ...p,
+  }),
+  {} as any
+);
 
-export const ATOMIC_NUMBER_MAP: AtomicNumberMap = {
-  1: "HYDROGEN",
-  2: "HELIUM",
-  3: "LITHIUM",
-  4: "BERYLLIUM",
-  5: "BORON",
-  6: "CARBON",
-  7: "NITROGEN",
-  8: "OXYGEN",
-  9: "FLUORINE",
-  10: "NEON",
-  11: "SODIUM",
-  12: "MAGNESIUM",
-  13: "ALUMINUM",
-  14: "SILICON",
-  15: "PHOSPHORUS",
-  16: "SULFUR",
-  17: "CHLORINE",
-  18: "ARGON",
-  19: "POTASSIUM",
-  20: "CALCIUM",
-  21: "SCANDIUM",
-  22: "TITANIUM",
-  23: "VANADIUM",
-  24: "CHROMIUM",
-  25: "MANGANESE",
-  26: "IRON",
-  27: "COBALT",
-  28: "NICKEL",
-  29: "COPPER",
-  30: "ZINC",
-  31: "GALLIUM",
-  32: "GERMANIUM",
-  33: "ARSENIC",
-  34: "SELENIUM",
-  35: "BROMINE",
-  36: "KRYPTON",
-  37: "RUBIDIUM",
-  38: "STRONTIUM",
-  39: "YTTRIUM",
-  40: "ZIRCONIUM",
-  41: "NIOBIUM",
-  42: "MOLYBDENUM",
-  43: "TECHNETIUM",
-  44: "RUTHENIUM",
-  45: "RHODIUM",
-  46: "PALLADIUM",
-  47: "SILVER",
-  48: "CADMIUM",
-  49: "INDIUM",
-  50: "TIN",
-  51: "ANTIMONY",
-  52: "TELLURIUM",
-  53: "IODINE",
-  54: "XENON",
-  55: "CESIUM",
-  56: "BARIUM",
-  57: "LANTHANUM",
-  58: "CERIUM",
-  59: "PRASEODYMIUM",
-  60: "NEODYMIUM",
-  61: "PROMETHIUM",
-  62: "SAMARIUM",
-  63: "EUROPIUM",
-  64: "GADOLINIUM",
-  65: "TERBIUM",
-  66: "DYSPROSIUM",
-  67: "HOLMIUM",
-  68: "ERBIUM",
-  69: "THULIUM",
-  70: "YTTERBIUM",
-  71: "LUTETIUM",
-  72: "HAFNIUM",
-  73: "TANTALUM",
-  74: "TUNGSTEN",
-  75: "RHENIUM",
-  76: "OSMIUM",
-  77: "IRIDIUM",
-  78: "PLATINUM",
-  79: "GOLD",
-  80: "MERCURY",
-  81: "THALLIUM",
-  82: "LEAD",
-  83: "BISMUTH",
-  84: "POLONIUM",
-  85: "ASTATINE",
-  86: "RADON",
-  87: "FRANCIUM",
-  88: "RADIUM",
-  89: "ACTINIUM",
-  90: "THORIUM",
-  91: "PROTACTINIUM",
-  92: "URANIUM",
-  93: "NEPTUNIUM",
-  94: "PLUTONIUM",
-  95: "AMERICIUM",
-  96: "CURIUM",
-  97: "BERKELIUM",
-  98: "CALIFORNIUM",
-};
+export const ATOMIC_NUMBER_MAP: AtomicNumberMap = Object.entries(
+  ELEMENTS
+).reduce<AtomicNumberMap>(
+  (p, [name, { atomicNumber }]) => ({
+    [atomicNumber]: name,
+    ...p,
+  }),
+  {} as any
+);
 
 const ELEMENT_MAP: { [index: number | string]: keyof Elements } = {
   ...ATOMIC_NUMBER_MAP,
@@ -2278,441 +2083,252 @@ const ELEMENT_MAP: { [index: number | string]: keyof Elements } = {
   ...ANION_MAP,
 };
 
-export const IONS: Ions = {
-  ACETATE: {
-    atomicMass:
-      ELEMENTS.CARBON.atomicMass * 2 +
-      ELEMENTS.HYDROGEN.atomicMass * 3 +
-      ELEMENTS.OXYGEN.atomicMass * 2,
-    name: "Acetate",
-    symbol: "C2H3O2",
-    parts: [
-      [ELEMENTS.CARBON, 2],
-      [ELEMENTS.HYDROGEN, 3],
-      [ELEMENTS.OXYGEN, 2],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  AMMONIUM: {
-    atomicMass: ELEMENTS.NITROGEN.atomicMass + ELEMENTS.HYDROGEN.atomicMass * 4,
-    name: "Ammonium",
-    symbol: "NH4",
-    parts: [
-      [ELEMENTS.NITROGEN, 1],
-      [ELEMENTS.HYDROGEN, 4],
-    ],
-    charge: 1,
-    type: "ion",
-  },
-  BORATE: {
-    atomicMass: ELEMENTS.BORON.atomicMass + ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Borate",
-    symbol: "BO3",
-    parts: [
-      [ELEMENTS.BORON, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -3,
-    type: "ion",
-  },
-  BROMATE: {
-    atomicMass: ELEMENTS.BROMINE.atomicMass + ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Bromate",
-    symbol: "BrO3",
-    parts: [
-      [ELEMENTS.BROMINE, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  CARBONATE: {
-    atomicMass: ELEMENTS.CARBON.atomicMass + ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Carbonate",
-    symbol: "CO3",
-    parts: [
-      [ELEMENTS.CARBON, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -2,
-    type: "ion",
-  },
-  CHLORATE: {
-    atomicMass: ELEMENTS.CHLORINE.atomicMass + ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Chlorate",
-    symbol: "ClO3",
-    parts: [
-      [ELEMENTS.CHLORINE, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  CHLORITE: {
-    atomicMass: ELEMENTS.CHLORINE.atomicMass + ELEMENTS.OXYGEN.atomicMass * 2,
-    name: "Chlorite",
-    symbol: "ClO2",
-    parts: [
-      [ELEMENTS.CHLORINE, 1],
-      [ELEMENTS.OXYGEN, 2],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  CHROMATE: {
-    atomicMass: ELEMENTS.CHROMIUM.atomicMass + ELEMENTS.OXYGEN.atomicMass * 4,
-    name: "Chromate",
-    symbol: "CrO4",
-    parts: [
-      [ELEMENTS.CHROMIUM, 1],
-      [ELEMENTS.OXYGEN, 4],
-    ],
-    charge: -2,
-    type: "ion",
-  },
-  CYANIDE: {
-    atomicMass: ELEMENTS.CARBON.atomicMass + ELEMENTS.NITROGEN.atomicMass,
-    name: "Cyanide",
-    symbol: "CN",
-    parts: [
-      [ELEMENTS.CARBON, 1],
-      [ELEMENTS.NITROGEN, 1],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  DICHROMATE: {
-    atomicMass:
-      ELEMENTS.CHROMIUM.atomicMass * 2 + ELEMENTS.OXYGEN.atomicMass * 7,
-    name: "Dichromate",
-    symbol: "Cr2O7",
-    parts: [
-      [ELEMENTS.CHROMIUM, 2],
-      [ELEMENTS.OXYGEN, 7],
-    ],
-    charge: -2,
-    type: "ion",
-  },
-  DIHYDROGEN_PHOSPHATE: {
-    atomicMass:
-      ELEMENTS.HYDROGEN.atomicMass * 2 +
-      ELEMENTS.PHOSPHORUS.atomicMass +
-      ELEMENTS.OXYGEN.atomicMass * 4,
-    name: "Dihydrogen phosphate",
-    symbol: "H2PO4",
-    parts: [
-      [ELEMENTS.HYDROGEN, 2],
-      [ELEMENTS.PHOSPHORUS, 1],
-      [ELEMENTS.OXYGEN, 4],
-    ],
-    charge: -2,
-    type: "ion",
-  },
-  HYDROGEN_BORATE: {
-    atomicMass:
-      ELEMENTS.HYDROGEN.atomicMass +
-      ELEMENTS.BORON.atomicMass +
-      ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Hydrogen borate",
-    symbol: "HBO3",
-    parts: [
-      [ELEMENTS.HYDROGEN, 1],
-      [ELEMENTS.BORON, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -2,
-    type: "ion",
-  },
-  HYDROGEN_CARBONATE: {
-    atomicMass:
-      ELEMENTS.HYDROGEN.atomicMass +
-      ELEMENTS.CARBON.atomicMass +
-      ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Hydrogen carbonate",
-    symbol: "HCO3",
-    parts: [
-      [ELEMENTS.HYDROGEN, 1],
-      [ELEMENTS.CARBON, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  HYDROGEN_PHOSPHATE: {
-    atomicMass:
-      ELEMENTS.HYDROGEN.atomicMass +
-      ELEMENTS.PHOSPHORUS.atomicMass +
-      ELEMENTS.OXYGEN.atomicMass * 4,
-    name: "Hydrogen phosphate",
-    symbol: "HPO4",
-    parts: [
-      [ELEMENTS.HYDROGEN, 1],
-      [ELEMENTS.PHOSPHORUS, 1],
-      [ELEMENTS.OXYGEN, 4],
-    ],
-    charge: -2,
-    type: "ion",
-  },
-  HYDROGEN_SULFATE: {
-    atomicMass:
-      ELEMENTS.HYDROGEN.atomicMass +
-      ELEMENTS.SULFUR.atomicMass +
-      ELEMENTS.OXYGEN.atomicMass * 4,
-    name: "Hydrogen sulfate",
-    symbol: "HSO4",
-    parts: [
-      [ELEMENTS.HYDROGEN, 1],
-      [ELEMENTS.SULFUR, 1],
-      [ELEMENTS.OXYGEN, 4],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  HYDROGEN_SULFIDE: {
-    atomicMass: ELEMENTS.SULFUR.atomicMass + ELEMENTS.HYDROGEN.atomicMass,
-    name: "Hydrogen sulfide",
-    symbol: "SH",
-    parts: [
-      [ELEMENTS.SULFUR, 1],
-      [ELEMENTS.HYDROGEN, 1],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  HYDROGEN_SULFITE: {
-    atomicMass:
-      ELEMENTS.HYDROGEN.atomicMass +
-      ELEMENTS.SULFUR.atomicMass +
-      ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Hydrogen sulfite",
-    symbol: "HSO3",
-    parts: [
-      [ELEMENTS.HYDROGEN, 1],
-      [ELEMENTS.SULFUR, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  HYDROXIDE: {
-    atomicMass: ELEMENTS.OXYGEN.atomicMass + ELEMENTS.HYDROGEN.atomicMass,
-    name: "Hydroxide",
-    symbol: "OH",
-    parts: [
-      [ELEMENTS.OXYGEN, 1],
-      [ELEMENTS.HYDROGEN, 1],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  HYPOCHLORITE: {
-    atomicMass: ELEMENTS.CHLORINE.atomicMass + ELEMENTS.OXYGEN.atomicMass,
-    name: "Hypochlorite",
-    symbol: "ClO",
-    parts: [
-      [ELEMENTS.CHLORINE, 1],
-      [ELEMENTS.OXYGEN, 1],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  IODATE: {
-    atomicMass: ELEMENTS.IODINE.atomicMass + ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Iodate",
-    symbol: "IO3",
-    parts: [
-      [ELEMENTS.IODINE, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  NITRATE: {
-    atomicMass: ELEMENTS.NITROGEN.atomicMass + ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Nitrate",
-    symbol: "NO3",
-    parts: [
-      [ELEMENTS.NITROGEN, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  NITRITE: {
-    atomicMass: ELEMENTS.NITROGEN.atomicMass + ELEMENTS.OXYGEN.atomicMass * 2,
-    name: "Nitrite",
-    symbol: "NO2",
-    parts: [
-      [ELEMENTS.NITROGEN, 1],
-      [ELEMENTS.OXYGEN, 2],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  PERCHLORATE: {
-    atomicMass: ELEMENTS.CHLORINE.atomicMass + ELEMENTS.OXYGEN.atomicMass * 4,
-    name: "Perchlorate",
-    symbol: "ClO4",
-    parts: [
-      [ELEMENTS.CHLORINE, 1],
-      [ELEMENTS.OXYGEN, 4],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  PERMANGANATE: {
-    atomicMass: ELEMENTS.MANGANESE.atomicMass + ELEMENTS.OXYGEN.atomicMass * 4,
-    name: "Permanganate",
-    symbol: "MnO4",
-    parts: [
-      [ELEMENTS.MANGANESE, 1],
-      [ELEMENTS.OXYGEN, 4],
-    ],
-    charge: -1,
-    type: "ion",
-  },
-  PHOSPHATE: {
-    atomicMass: ELEMENTS.PHOSPHORUS.atomicMass + ELEMENTS.OXYGEN.atomicMass * 4,
-    name: "Phosphate",
-    symbol: "PO4",
-    parts: [
-      [ELEMENTS.PHOSPHORUS, 1],
-      [ELEMENTS.OXYGEN, 4],
-    ],
-    charge: -3,
-    type: "ion",
-  },
-  PHOSPHITE: {
-    atomicMass: ELEMENTS.PHOSPHORUS.atomicMass + ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Phosphite",
-    symbol: "PO3",
-    parts: [
-      [ELEMENTS.PHOSPHORUS, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -3,
-    type: "ion",
-  },
-  SILICATE: {
-    atomicMass: ELEMENTS.SILICON.atomicMass + ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Silicate",
-    symbol: "SiO3",
-    parts: [
-      [ELEMENTS.SILICON, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -2,
-    type: "ion",
-  },
-  SULFATE: {
-    atomicMass: ELEMENTS.SULFUR.atomicMass + ELEMENTS.OXYGEN.atomicMass * 4,
-    name: "Sulfate",
-    symbol: "SO4",
-    parts: [
-      [ELEMENTS.SULFUR, 1],
-      [ELEMENTS.OXYGEN, 4],
-    ],
-    charge: -2,
-    type: "ion",
-  },
-  SULFITE: {
-    atomicMass: ELEMENTS.SULFUR.atomicMass + ELEMENTS.OXYGEN.atomicMass * 3,
-    name: "Sulfite",
-    symbol: "SO3",
-    parts: [
-      [ELEMENTS.SULFUR, 1],
-      [ELEMENTS.OXYGEN, 3],
-    ],
-    charge: -2,
-    type: "ion",
-  },
-};
+export const IONS: Ions = {} as Ions;
 
-const ION_MAP: { [key: string]: keyof Ions } = {
-  0: "ACETATE",
-  C2H3O2: "ACETATE",
-  CH3COO: "ACETATE",
-  1: "AMMONIUM",
-  NH4: "AMMONIUM",
-  2: "BORATE",
-  BO3: "BORATE",
-  3: "BROMATE",
-  BrO3: "BROMATE",
-  4: "CARBONATE",
-  CO3: "CARBONATE",
-  5: "CHLORATE",
-  ClO3: "CHLORATE",
-  6: "CHLORITE",
-  ClO2: "CHLORITE",
-  7: "CHROMATE",
-  CrO4: "CHROMATE",
-  8: "CYANIDE",
-  CN: "CYANIDE",
-  9: "DICHROMATE",
-  Cr2O7: "DICHROMATE",
-  10: "DIHYDROGEN_PHOSPHATE",
-  H2PO4: "DIHYDROGEN_PHOSPHATE",
-  11: "HYDROGEN_BORATE",
-  HBO3: "HYDROGEN_BORATE",
-  Biborate: "HYDROGEN_BORATE",
-  12: "HYDROGEN_CARBONATE",
-  HCO3: "HYDROGEN_CARBONATE",
-  Bicarbonate: "HYDROGEN_CARBONATE",
-  13: "HYDROGEN_PHOSPHATE",
-  HPO4: "HYDROGEN_PHOSPHATE",
-  Biphosphate: "HYDROGEN_PHOSPHATE",
-  14: "HYDROGEN_SULFATE",
-  HSO4: "HYDROGEN_SULFATE",
-  Bisulfate: "HYDROGEN_SULFATE",
-  15: "HYDROGEN_SULFIDE",
-  SH: "HYDROGEN_SULFIDE",
-  Bisulfide: "HYDROGEN_SULFIDE",
-  16: "HYDROGEN_SULFITE",
-  HSO3: "HYDROGEN_SULFITE",
-  Bisulfite: "HYDROGEN_SULFITE",
-  17: "HYDROXIDE",
-  OH: "HYDROXIDE",
-  18: "HYPOCHLORITE",
-  ClO: "HYPOCHLORITE",
-  19: "IODATE",
-  IO3: "IODATE",
-  20: "NITRATE",
-  NO3: "NITRATE",
-  21: "NITRITE",
-  NO2: "NITRITE",
-  22: "PERCHLORATE",
-  ClO4: "PERCHLORATE",
-  23: "PERMANGANATE",
-  MnO4: "PERMANGANATE",
-  24: "PHOSPHATE",
-  PO4: "PHOSPHATE",
-  25: "PHOSPHITE",
-  PO3: "PHOSPHITE",
-  26: "SILICATE",
-  SiO3: "SILICATE",
-  27: "SULFATE",
-  SO4: "SULFATE",
-  28: "SULFITE",
-  SO3: "SULFITE",
-};
+const ION_MAP: { [key: string | number]: keyof Ions } = {};
 
-export const COMPOUNDS: Compounds = {
-  WATER: {
-    atomicMass: ELEMENTS.HYDROGEN.atomicMass * 2 + ELEMENTS.OXYGEN.atomicMass,
-    name: "Water",
-    parts: [
-      [ELEMENTS.HYDROGEN, 2],
-      [ELEMENTS.OXYGEN, 1],
-    ],
-    symbol: "H2O",
-    type: "molecular",
-  },
-};
+export const COMPOUNDS: Compounds = {} as Compounds;
 
-export const COMPOUND_MAP: { [key: string]: keyof Compounds } = {
-  0: "WATER",
-  H2O: "WATER",
-};
+export const COMPOUND_MAP: { [key: string]: keyof Compounds } = {};
 
 // TODO: Add named compound list
+
+// #region Ions
+
+let ionLength = 0;
+function createIon(
+  names: string[],
+  charge: number,
+  parts: [Element, number][],
+  altSymbols?: string[]
+): void {
+  const id = names[0].replace(/\s/g, "_").toUpperCase() as keyof Ions;
+
+  let atomicMass = 0;
+  let symbol = "";
+
+  for (let x = 0; x < parts.length; x++) {
+    const [{ atomicMass: m, symbol: s }, n] = parts[x];
+
+    atomicMass += m * n;
+    symbol += s + (n > 1 ? n : "");
+  }
+
+  const ion: Ion = {
+    atomicMass,
+    charge,
+    name: names[0],
+    parts,
+    symbol,
+    type: "ion",
+  };
+
+  IONS[id as "ACETATE"] = ion;
+  ION_MAP[ionLength++] = id;
+  ION_MAP[ion.symbol] = id;
+
+  for (let x = 1; x < names.length; x++) {
+    ION_MAP[names[x]] = id;
+  }
+
+  for (let x = 0; x < (altSymbols?.length || 0); x++) {
+    if (altSymbols?.[x]) ION_MAP[altSymbols[x]] = id;
+  }
+}
+
+createIon(
+  ["Acetate"],
+  -1,
+  [
+    [ELEMENTS.CARBON, 2],
+    [ELEMENTS.HYDROGEN, 3],
+    [ELEMENTS.OXYGEN, 2],
+  ],
+  ["CH3COO"]
+);
+createIon(["Ammonium"], 1, [
+  [ELEMENTS.NITROGEN, 1],
+  [ELEMENTS.HYDROGEN, 4],
+]);
+createIon(["Borate"], -3, [
+  [ELEMENTS.BORON, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+createIon(["Bromate"], -1, [
+  [ELEMENTS.BROMINE, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+createIon(["Carbonate"], -2, [
+  [ELEMENTS.CARBON, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+createIon(["Chlorate"], -1, [
+  [ELEMENTS.CHLORINE, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+createIon(["Chlorite"], -1, [
+  [ELEMENTS.CHLORINE, 1],
+  [ELEMENTS.OXYGEN, 2],
+]);
+createIon(["Chromate"], -2, [
+  [ELEMENTS.CHROMIUM, 1],
+  [ELEMENTS.OXYGEN, 4],
+]);
+createIon(["Cyanide"], -1, [
+  [ELEMENTS.CARBON, 1],
+  [ELEMENTS.NITROGEN, 1],
+]);
+createIon(["Dichromate"], -2, [
+  [ELEMENTS.CHROMIUM, 2],
+  [ELEMENTS.OXYGEN, 7],
+]);
+createIon(["Dihydrogen phosphate"], -2, [
+  [ELEMENTS.HYDROGEN, 2],
+  [ELEMENTS.PHOSPHORUS, 1],
+  [ELEMENTS.OXYGEN, 4],
+]);
+createIon(["Hydrogen borate", "Biborate"], -2, [
+  [ELEMENTS.HYDROGEN, 1],
+  [ELEMENTS.BORON, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+createIon(["Hydrogen carbonate", "Bicarbonate"], -1, [
+  [ELEMENTS.HYDROGEN, 1],
+  [ELEMENTS.CARBON, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+createIon(["Hydrogen phosphate", "Biphosphate"], -2, [
+  [ELEMENTS.HYDROGEN, 1],
+  [ELEMENTS.PHOSPHORUS, 1],
+  [ELEMENTS.OXYGEN, 4],
+]);
+createIon(["Hydrogen sulfate", "Bisulfate"], -1, [
+  [ELEMENTS.HYDROGEN, 1],
+  [ELEMENTS.SULFUR, 1],
+  [ELEMENTS.OXYGEN, 4],
+]);
+createIon(["Hydrogen sulfide", "Bisulfide"], -1, [
+  [ELEMENTS.SULFUR, 1],
+  [ELEMENTS.HYDROGEN, 1],
+]);
+createIon(["Hydrogen sulfite", "Bisulfite"], -1, [
+  [ELEMENTS.HYDROGEN, 1],
+  [ELEMENTS.SULFUR, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+createIon(["Hydroxide"], -1, [
+  [ELEMENTS.OXYGEN, 1],
+  [ELEMENTS.HYDROGEN, 1],
+]);
+createIon(["Hypochlorite"], -1, [
+  [ELEMENTS.CHLORINE, 1],
+  [ELEMENTS.OXYGEN, 1],
+]);
+createIon(["Iodate"], -1, [
+  [ELEMENTS.IODINE, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+createIon(["Nitrate"], -1, [
+  [ELEMENTS.NITROGEN, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+createIon(["Nitrite"], -1, [
+  [ELEMENTS.NITROGEN, 1],
+  [ELEMENTS.OXYGEN, 2],
+]);
+createIon(["Perchlorate"], -1, [
+  [ELEMENTS.CHLORINE, 1],
+  [ELEMENTS.OXYGEN, 4],
+]);
+createIon(["Permanganate"], -1, [
+  [ELEMENTS.MANGANESE, 1],
+  [ELEMENTS.OXYGEN, 4],
+]);
+createIon(["Phosphate"], -3, [
+  [ELEMENTS.PHOSPHORUS, 1],
+  [ELEMENTS.OXYGEN, 4],
+]);
+createIon(["Phosphite"], -3, [
+  [ELEMENTS.PHOSPHORUS, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+createIon(["Silicate"], -2, [
+  [ELEMENTS.SILICON, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+createIon(["Sulfate"], -2, [
+  [ELEMENTS.SULFUR, 1],
+  [ELEMENTS.OXYGEN, 4],
+]);
+createIon(["Sulfite"], -2, [
+  [ELEMENTS.SULFUR, 1],
+  [ELEMENTS.OXYGEN, 3],
+]);
+
+// #endregion
+
+// #region Compounds
+
+let compoundCount = 0;
+function createCompound(
+  names: string[],
+  type: "ionic" | "molecular",
+  parts: [Element | Ion, number][],
+  altSymbols?: string[]
+): void {
+  const id = names[0].replace(/\s/g, "_").toUpperCase() as keyof Compounds;
+
+  let atomicMass = 0;
+  let symbol = "";
+
+  for (let x = 0; x < parts.length; x++) {
+    const [{ atomicMass: m, symbol: s }, n] = parts[x];
+
+    atomicMass += m * n;
+    symbol += s + (n > 1 ? n : "");
+  }
+
+  const compound: Compound = {
+    atomicMass,
+    name: names[0],
+    parts,
+    symbol,
+    type,
+  };
+
+  COMPOUNDS[id as "WATER"] = compound;
+  COMPOUND_MAP[compoundCount++] = id;
+  COMPOUND_MAP[compound.symbol] = id;
+
+  for (let x = 1; x < names.length; x++) {
+    COMPOUND_MAP[names[x]] = id;
+  }
+
+  for (let x = 0; x < (altSymbols?.length || 0); x++) {
+    if (altSymbols?.[x]) COMPOUND_MAP[altSymbols[x]] = id;
+  }
+}
+// TODO: implement parsing of acids
+createCompound(["Water"], "molecular", [
+  [ELEMENTS.HYDROGEN, 2],
+  [ELEMENTS.OXYGEN, 1],
+]);
+createCompound(["Ammonia"], "molecular", [
+  [ELEMENTS.NITROGEN, 1],
+  [ELEMENTS.HYDROGEN, 3],
+]);
+createCompound(["Sulfuric Acid"], "ionic", [
+  [ELEMENTS.HYDROGEN, 2],
+  [IONS.SULFATE, 1],
+]);
+createCompound(["Glucose"], "molecular", [
+  [ELEMENTS.CARBON, 6],
+  [ELEMENTS.HYDROGEN, 12],
+  [ELEMENTS.OXYGEN, 6],
+]);
+createCompound(["Hydrochloric Acid"], "ionic", [
+  [ELEMENTS.HYDROGEN, 1],
+  [ELEMENTS.CHLORINE, 1],
+]);
+
+// #endregion

@@ -16,7 +16,7 @@ declare const ELEMENT_MAP: {
 };
 export declare const IONS: Ions;
 declare const ION_MAP: {
-    [key: string]: keyof Ions;
+    [key: string | number]: keyof Ions;
 };
 export declare const COMPOUNDS: Compounds;
 export declare const COMPOUND_MAP: {

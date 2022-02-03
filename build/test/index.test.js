@@ -67,7 +67,7 @@ try {
     assert("Iron(II) chloride", new Compound_1.Compound("Iron chloride").name);
     assert("Copper(I) iodide", new Compound_1.Compound("Copper iodide").name);
     assert("Titanium(III) bromide", new Compound_1.Compound("Titanium bromide").name);
-    assert("Manganese(VI) sulfide", new Compound_1.Compound("Manganese sulfide").name);
+    assert("Manganese(III) sulfide", new Compound_1.Compound("Manganese sulfide").name);
     assert("Silver fluoride", new Compound_1.Compound("Silver fluoride").name);
     assert("Zinc sulfate", new Compound_1.Compound("Zinc sulfate").name);
     console.log();
@@ -129,5 +129,17 @@ try {
 }
 catch (error) {
     console.error("Transition Metal Symbol tests \u001b[31mfailed!\u001b[0m\n" +
+        ((error === null || error === void 0 ? void 0 : error.message) ? error.stack : ""));
+}
+console.log("Named Compound Symbol tests: ");
+try {
+    assert("NH3", new Compound_1.Compound("Ammonia").symbol);
+    assert("H2O", new Compound_1.Compound("Water").symbol);
+    assert("H2SO4", new Compound_1.Compound("Sulfuric Acid").symbol);
+    assert("HCl", new Compound_1.Compound("Hydrochloric Acid").symbol);
+    console.log("Named Compound Symbol tests \u001b[32;1msucceeded!\u001b[0m\n");
+}
+catch (error) {
+    console.error("Named Compound Symbol tests \u001b[31mfailed!\u001b[0m\n" +
         ((error === null || error === void 0 ? void 0 : error.message) ? error.stack : ""));
 }

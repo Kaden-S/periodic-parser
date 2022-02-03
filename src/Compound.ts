@@ -1,5 +1,5 @@
 import { getCompound, getElement, isIon, REVERSED_ANION_MAP } from "./Elements";
-import type { Element, Ion } from "./types";
+import type { BaseElement, Element, Ion } from "./types";
 
 export interface Compound {
   name: string;
@@ -7,6 +7,8 @@ export interface Compound {
   atomicMass: number;
   symbol: string;
   parts: [Element | Ion, number][];
+
+  toString(): string;
 }
 
 const numMap: { [i: number]: string } = {
@@ -64,11 +66,13 @@ const REVERSED_NUMERALS = {
   X: 10,
 };
 
-const METAL_TYPES = [
+const METAL_TYPES: BaseElement["type"][] = [
   "alkaline-earth-metal",
   "alkali-metal",
   "post-transition-metal",
   "transition-metal",
+  "actinoid",
+  "lanthanoid",
   "metal",
   "ion",
 ];
@@ -125,7 +129,6 @@ export class Compound {
       METAL_TYPES.includes(
         getElement(parts[0][0].replace(/ ?\([IiVvXx]+\)/, "")).type
       )
-      // TODO: Check for hydrogen bonds here
     ) {
       return new IonicCompound(parts);
     }
@@ -153,12 +156,27 @@ class BaseCompound implements Compound {
       ""
     );
   }
+  toString(): string {
+    return JSON.stringify(
+      this,
+      (key, value) => {
+        if (key === "parts") {
+          value = (value as [Element, number][]).map(
+            ([el, n]) => `${n} ${el.name}`
+          );
+        }
+        return value;
+      },
+      2
+    );
+  }
 }
 
 class MolecularCompound extends BaseCompound {
   readonly type = "molecular";
   readonly name: string;
   constructor(parts: [string, number][]) {
+    // TODO: parse mono, di, tri, etc.
     super(parts.map(([s, n]) => [getElement(s), n]));
 
     this.name = molecularify(this.parts);
@@ -168,20 +186,48 @@ class MolecularCompound extends BaseCompound {
 class IonicCompound extends BaseCompound {
   readonly type = "ionic";
   readonly name: string;
+  readonly cation: Element | Ion;
+  readonly anion: Element | Ion;
   constructor(parts: [string, number][]) {
     super(balanceIonicCompound(ensureIonic(parts)));
 
-    const el = this.parts[0][0];
-    const el1 = this.parts[1][0];
+    this.cation = this.parts[0][0];
+    this.anion = this.parts[1][0];
 
-    const name =
-      el.name +
-      (!isIon(el) && isTransitionMetal(el as Element)
-        ? "(" + NUMERAL[this.parts[1][1] as 1] + ")"
+    const cationName =
+      this.cation.name +
+      (!isIon(this.cation) && isTransitionMetal(this.cation as Element)
+        ? "(" +
+          NUMERAL[((this.parts[0][0] as Ion).charge || this.parts[1][1]) as 1] +
+          ")"
         : "");
-    const name1 = isIon(el1) ? el1.name : ionify(el1.name);
 
-    this.name = name + " " + name1.toLowerCase();
+    const anionName = isIon(this.anion)
+      ? this.anion.name
+      : ionify(this.anion.name);
+
+    this.name = cationName + " " + anionName.toLowerCase();
+  }
+  toString(): string {
+    return JSON.stringify(
+      this,
+      (key, value) => {
+        switch (key) {
+          case "parts":
+            value = (value as [Element, number][]).map(
+              ([el, n]) => `${n} ${el.name}`
+            );
+            break;
+          case "anion":
+          case "cation":
+            value = value.name;
+          default:
+            break;
+        }
+        return value;
+      },
+      2
+    );
   }
 }
 
@@ -219,48 +265,53 @@ function ensureIonic(parts: [string, number][]): [Element | Ion, number][] {
   ];
 }
 
-function balanceIonicCompound(parts: [Element | Ion, number][]) {
-  const el: Element | Ion = parts[0][0];
-  const el1: Element | Ion = parts[1][0];
+function balanceIonicCompound(
+  parts: [Element | Ion, number][]
+): [Element | Ion, number][] {
+  const cation: Element | Ion = parts[0][0];
+  const anion: Element | Ion = parts[1][0];
 
-  let charge = getIonicCharge(el);
-  let charge1 = getIonicCharge(el1);
+  const cationCharge = getIonicCharge(cation);
+  const anionCharge = getIonicCharge(anion);
 
-  const [a, b] = balance([
-    [el.name, charge],
-    [el1.name, charge1],
+  const [cationAmt, anionAmt] = balance([
+    [cation.name, cationCharge],
+    [anion.name, anionCharge],
   ]);
 
-  parts[0][1] = a;
-  parts[1][1] = b;
-
-  return parts;
+  return [
+    [cation, cationAmt],
+    [anion, anionAmt],
+  ];
 }
 function balance(parts: [string, number][], tryAgain = true): [number, number] {
-  const [[name, charge], [name1, charge1]] = parts;
-  const abs = Math.abs(charge);
-  const abs1 = Math.abs(charge1);
+  const [[cation, cationCharge], [anion, anionCharge]] = parts;
+  const cationChargeAbs = Math.abs(cationCharge);
+  const anionChargeAbs = Math.abs(anionCharge);
 
-  const sum = charge + charge1;
+  const sum = cationCharge + anionCharge;
 
-  if (sum > Math.max(charge, charge1) || sum < Math.min(charge, charge1)) {
-    if (!tryAgain || (abs !== 4 && abs1 !== 4))
+  if (
+    sum > Math.max(cationCharge, anionCharge) ||
+    sum < Math.min(cationCharge, anionCharge)
+  ) {
+    if (!tryAgain || (cationChargeAbs !== 4 && anionChargeAbs !== 4))
       throw new Error(
-        `Unbalanceable Ionic Compound: ${name} ${charge} and ${name1} ${charge1}`
+        `Unbalanceable Ionic Compound: ${cation} ${cationCharge} and ${anion} ${anionCharge}`
       );
-    if (abs === 4) {
+    if (cationChargeAbs === 4) {
       return balance(
         [
-          [name, charge === 4 ? -4 : 4],
-          [name1, charge1],
+          [cation, cationCharge === 4 ? -4 : 4],
+          [anion, anionCharge],
         ],
         false
       );
     } else {
       return balance(
         [
-          [name, charge],
-          [name1, charge1 === 4 ? -4 : 4],
+          [cation, cationCharge],
+          [anion, anionCharge === 4 ? -4 : 4],
         ],
         false
       );
@@ -269,7 +320,17 @@ function balance(parts: [string, number][], tryAgain = true): [number, number] {
 
   if (sum === 0) return [1, 1];
 
-  return [abs1, abs];
+  // Reduces to lowest terms
+  const remainder = anionChargeAbs % cationChargeAbs;
+  const remainder1 = cationChargeAbs % anionChargeAbs;
+
+  if (remainder === 0) {
+    return [anionChargeAbs / remainder1, cationChargeAbs / remainder1];
+  } else if (remainder1 === 0) {
+    return [anionChargeAbs / remainder, cationChargeAbs / remainder];
+  }
+
+  return [anionChargeAbs, cationChargeAbs];
 }
 
 function getIonicCharge(el: Element | Ion): number {
@@ -361,13 +422,14 @@ function getIonicElement(symbol: string): Element | Ion {
 
   const element = getElement(symbol);
   if (typeof c === "number") {
-    if (!isTransitionMetal(element))
+    if (!isTransitionMetal(element)) {
       throw new Error(
         element.name +
           " only has one charge (+" +
           (element as Element).commonOxidationStates[0] +
           ")"
       );
+    }
 
     if (!(element as Element).oxidationStates.includes(c))
       throw new Error(
@@ -375,6 +437,7 @@ function getIonicElement(symbol: string): Element | Ion {
       );
 
     if (!(element as Element).commonOxidationStates.includes(c))
+      // TODO: Make this an actual warning somehow
       console.warn(
         "Uncommon oxidation state used " + symbol + "(" + NUMERAL[c as 1] + ")"
       );
@@ -384,10 +447,12 @@ function getIonicElement(symbol: string): Element | Ion {
 }
 
 function isTransitionMetal(e: Element | Ion): boolean {
+  const isElement = "commonOxidationStates" in e;
+
+  if (!isElement) return false;
+
   return (
-    "commonOxidationStates" in e &&
-    e.group > 2 &&
-    e.group < 13 &&
+    (e.period > 4 || (e.group > 2 && e.group < 13)) &&
     e.commonOxidationStates.length > 1
   );
 }

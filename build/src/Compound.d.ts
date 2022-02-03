@@ -5,6 +5,7 @@ export interface Compound {
     atomicMass: number;
     symbol: string;
     parts: [Element | Ion, number][];
+    toString(): string;
 }
 export declare class Compound {
     constructor(compoundName: string);
