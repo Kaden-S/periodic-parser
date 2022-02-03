@@ -1,5 +1,5 @@
 import { ELEMENTS } from "../src/Elements";
-import type { Element } from "./Element";
+import type { Element } from "./types";
 
 const ions = [
   ["Ammonium", 1, [ELEMENTS.NITROGEN, 1], [ELEMENTS.HYDROGEN, 4]],
