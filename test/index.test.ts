@@ -68,12 +68,12 @@ try {
 
 console.log("Transition Metal Name tests: ");
 try {
-  assert("Iron(II) chloride", new Compound("Iron chloride").name);
-  assert("Copper(I) iodide", new Compound("Copper iodide").name);
-  assert("Titanium(III) bromide", new Compound("Titanium bromide").name);
-  assert("Manganese(III) sulfide", new Compound("Manganese sulfide").name);
-  assert("Silver fluoride", new Compound("Silver fluoride").name);
-  assert("Zinc sulfate", new Compound("Zinc sulfate").name);
+  assert("Iron(III) chloride", new Compound("FeCl3").name);
+  assert("Copper(II) sulfate", new Compound("CuSO4").name);
+  assert("Titanium(III) bromide", new Compound("TiBr3").name);
+  assert("Manganese(III) sulfide", new Compound("Mn2S3").name);
+  assert("Silver fluoride", new Compound("AgF").name);
+  assert("Zinc sulfate", new Compound("ZnSO4").name);
   console.log();
 
   assert("Iron(II) chloride", new Compound("Iron(II) chloride").name);

@@ -144,7 +144,9 @@ class IonicCompound extends BaseCompound {
         const cationName = this.cation.name +
             (!(0, Elements_1.isIon)(this.cation) && isTransitionMetal(this.cation)
                 ? "(" +
-                    NUMERAL[(this.parts[0][0].charge || this.parts[1][1])] +
+                    NUMERAL[Math.abs(this.parts[0][0].charge ||
+                        this.parts[1][0].charge * this.parts[1][1] ||
+                        this.parts[1][1])] +
                     ")"
                 : "");
         const anionName = (0, Elements_1.isIon)(this.anion)
@@ -203,8 +205,9 @@ function ensureIonic(parts) {
 function balanceIonicCompound(parts) {
     const cation = parts[0][0];
     const anion = parts[1][0];
-    const cationCharge = getIonicCharge(cation);
-    const anionCharge = getIonicCharge(anion);
+    const [reducedCationCharge, reducedAnionCharge] = reduceCharge(Math.abs(parts[0][1]), Math.abs(parts[1][1]));
+    const cationCharge = getIonicCharge(cation, reducedCationCharge);
+    const anionCharge = getIonicCharge(anion, reducedAnionCharge);
     const [cationAmt, anionAmt] = balance([
         [cation.name, cationCharge],
         [anion.name, anionCharge],
@@ -238,18 +241,9 @@ function balance(parts, tryAgain = true) {
     }
     if (sum === 0)
         return [1, 1];
-    // Reduces to lowest terms
-    const remainder = anionChargeAbs % cationChargeAbs;
-    const remainder1 = cationChargeAbs % anionChargeAbs;
-    if (remainder === 0) {
-        return [anionChargeAbs / remainder1, cationChargeAbs / remainder1];
-    }
-    else if (remainder1 === 0) {
-        return [anionChargeAbs / remainder, cationChargeAbs / remainder];
-    }
-    return [anionChargeAbs, cationChargeAbs];
+    return reduceCharge(cationChargeAbs, anionChargeAbs);
 }
-function getIonicCharge(el) {
+function getIonicCharge(el, suggested) {
     if ("charge" in el)
         return el.charge;
     // Group 1 or 2 (+1, +2)
@@ -267,6 +261,8 @@ function getIonicCharge(el) {
     const states = el.commonOxidationStates;
     if (states.length === 1)
         return states[0];
+    if (suggested && states.includes(suggested))
+        return suggested;
     return states.at(-2);
 }
 const vowels = ["a", "e", "i", "o", "u", "y"];
@@ -339,4 +335,17 @@ function isTransitionMetal(e) {
         return false;
     return ((e.period > 4 || (e.group > 2 && e.group < 13)) &&
         e.commonOxidationStates.length > 1);
+}
+function reduceCharge(cationChargeAbs, anionChargeAbs) {
+    const remainder = anionChargeAbs % cationChargeAbs;
+    const remainder1 = cationChargeAbs % anionChargeAbs;
+    if (remainder === 0 && remainder1 === 0)
+        return [1, 1];
+    if (remainder === 0) {
+        return [anionChargeAbs / remainder1, cationChargeAbs / remainder1];
+    }
+    else if (remainder1 === 0) {
+        return [anionChargeAbs / remainder, cationChargeAbs / remainder];
+    }
+    return [anionChargeAbs, cationChargeAbs];
 }

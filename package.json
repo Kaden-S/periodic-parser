@@ -1,11 +1,12 @@
 {
   "name": "periodic-parser",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Tool for parsing periodic table elements",
   "main": "build/src/index.js",
   "scripts": {
     "build": "tsc",
     "watch": "npm run build -- --watch",
+    "watch:background": "nohup npm run watch > /dev/null &",
     "test": "node build/test/index.test.js",
     "buildIons": "node build/test/IonBuilder.test.js > ions.ts",
     "salt": "node build/test/GetElement.test.js sodium chloride"

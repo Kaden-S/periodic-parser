@@ -64,12 +64,12 @@ catch (error) {
 }
 console.log("Transition Metal Name tests: ");
 try {
-    assert("Iron(II) chloride", new Compound_1.Compound("Iron chloride").name);
-    assert("Copper(I) iodide", new Compound_1.Compound("Copper iodide").name);
-    assert("Titanium(III) bromide", new Compound_1.Compound("Titanium bromide").name);
-    assert("Manganese(III) sulfide", new Compound_1.Compound("Manganese sulfide").name);
-    assert("Silver fluoride", new Compound_1.Compound("Silver fluoride").name);
-    assert("Zinc sulfate", new Compound_1.Compound("Zinc sulfate").name);
+    assert("Iron(III) chloride", new Compound_1.Compound("FeCl3").name);
+    assert("Copper(II) sulfate", new Compound_1.Compound("CuSO4").name);
+    assert("Titanium(III) bromide", new Compound_1.Compound("TiBr3").name);
+    assert("Manganese(III) sulfide", new Compound_1.Compound("Mn2S3").name);
+    assert("Silver fluoride", new Compound_1.Compound("AgF").name);
+    assert("Zinc sulfate", new Compound_1.Compound("ZnSO4").name);
     console.log();
     assert("Iron(II) chloride", new Compound_1.Compound("Iron(II) chloride").name);
     assert("Copper(I) iodide", new Compound_1.Compound("Copper(I) iodide").name);

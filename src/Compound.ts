@@ -198,7 +198,13 @@ class IonicCompound extends BaseCompound {
       this.cation.name +
       (!isIon(this.cation) && isTransitionMetal(this.cation as Element)
         ? "(" +
-          NUMERAL[((this.parts[0][0] as Ion).charge || this.parts[1][1]) as 1] +
+          NUMERAL[
+            Math.abs(
+              (this.parts[0][0] as Ion).charge ||
+                (this.parts[1][0] as Ion).charge * this.parts[1][1] ||
+                this.parts[1][1]
+            ) as 1
+          ] +
           ")"
         : "");
 
@@ -271,8 +277,13 @@ function balanceIonicCompound(
   const cation: Element | Ion = parts[0][0];
   const anion: Element | Ion = parts[1][0];
 
-  const cationCharge = getIonicCharge(cation);
-  const anionCharge = getIonicCharge(anion);
+  const [reducedCationCharge, reducedAnionCharge] = reduceCharge(
+    Math.abs(parts[0][1]),
+    Math.abs(parts[1][1])
+  );
+
+  const cationCharge = getIonicCharge(cation, reducedCationCharge);
+  const anionCharge = getIonicCharge(anion, reducedAnionCharge);
 
   const [cationAmt, anionAmt] = balance([
     [cation.name, cationCharge],
@@ -320,20 +331,10 @@ function balance(parts: [string, number][], tryAgain = true): [number, number] {
 
   if (sum === 0) return [1, 1];
 
-  // Reduces to lowest terms
-  const remainder = anionChargeAbs % cationChargeAbs;
-  const remainder1 = cationChargeAbs % anionChargeAbs;
-
-  if (remainder === 0) {
-    return [anionChargeAbs / remainder1, cationChargeAbs / remainder1];
-  } else if (remainder1 === 0) {
-    return [anionChargeAbs / remainder, cationChargeAbs / remainder];
-  }
-
-  return [anionChargeAbs, cationChargeAbs];
+  return reduceCharge(cationChargeAbs, anionChargeAbs);
 }
 
-function getIonicCharge(el: Element | Ion): number {
+function getIonicCharge(el: Element | Ion, suggested?: number): number {
   if ("charge" in el) return el.charge;
 
   // Group 1 or 2 (+1, +2)
@@ -350,6 +351,7 @@ function getIonicCharge(el: Element | Ion): number {
   // Group 3-12 (Transition metals)
   const states: any = el.commonOxidationStates;
   if (states.length === 1) return states[0];
+  if (suggested && states.includes(suggested)) return suggested;
   return states.at(-2);
 }
 
@@ -455,4 +457,21 @@ function isTransitionMetal(e: Element | Ion): boolean {
     (e.period > 4 || (e.group > 2 && e.group < 13)) &&
     e.commonOxidationStates.length > 1
   );
+}
+function reduceCharge(
+  cationChargeAbs: number,
+  anionChargeAbs: number
+): [number, number] {
+  const remainder = anionChargeAbs % cationChargeAbs;
+  const remainder1 = cationChargeAbs % anionChargeAbs;
+
+  if (remainder === 0 && remainder1 === 0) return [1, 1];
+
+  if (remainder === 0) {
+    return [anionChargeAbs / remainder1, cationChargeAbs / remainder1];
+  } else if (remainder1 === 0) {
+    return [anionChargeAbs / remainder, cationChargeAbs / remainder];
+  }
+
+  return [anionChargeAbs, cationChargeAbs];
 }
